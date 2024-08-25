@@ -8,7 +8,7 @@ import chalk from "chalk";
 const cli = meow({
   importMeta: import.meta,
   help: `
-		TermTodo - cli todos manager
+		TermTodo - cli based todolist manager
 		${chalk.bold("Usage:")} termtodo [options] [value]
       $ termtodo
       $ termtodo --help
