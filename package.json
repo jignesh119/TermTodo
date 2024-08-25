@@ -1,7 +1,7 @@
 {
-  "name": "termtodo",
+  "name": "@jignesh119/termtodo",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "cli based todolist manager",
   "type": "module",
   "bin": {
     "termtodo": "dist/cli.js"
@@ -10,8 +10,25 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "babel src -d dist"
   },
-  "keywords": [],
-  "author": "",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jignesh119/TermTodo.git"
+  },
+  "keywords": [
+    "cli",
+    "todo",
+    "todolist",
+    "ink"
+  ],
+  "bugs": {
+    "url": "https://github.com/jignesh119/TermTodo/issues"
+  },
+  "homepage": "https://github.com/jignesh119/TermTodo/#readme",
+  "author": "jignesh119",
   "license": "ISC",
   "description": "",
   "dependencies": {

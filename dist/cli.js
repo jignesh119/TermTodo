@@ -22,7 +22,7 @@ const cli = meow({
 
 		${chalk.bold("Examples:")}
       $ termtodo --help
-      $ todo --color magenta
+      $ termtodo --color magenta
 	`,
   flags: {
     color: {

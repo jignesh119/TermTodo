@@ -276,11 +276,26 @@ function App({
     flexDirection: "column"
   }, /*#__PURE__*/React.createElement(Header, null), /*#__PURE__*/React.createElement(TodosListing, null))));
 }
+const CompThatDoesntNeedInput = () => {
+  return /*#__PURE__*/React.createElement(Box, {
+    padding: 1,
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    borderColor: "red",
+    borderStyle: "round"
+  }, /*#__PURE__*/React.createElement(Text, {
+    color: "red"
+  }, "Error:"), /*#__PURE__*/React.createElement(Text, null, "tty/stdin/stdout not detected"), /*#__PURE__*/React.createElement(Text, null, "Todolister needs input,output streams attached along with tty to run"));
+};
 const Main = ({
   prefColor
 }) => {
-  return /*#__PURE__*/React.createElement(App, {
+  const {
+    isRawModeSupported
+  } = useStdin();
+  return isRawModeSupported ? /*#__PURE__*/React.createElement(App, {
     prefColor: prefColor
-  });
+  }) : /*#__PURE__*/React.createElement(CompThatDoesntNeedInput, null);
 };
 export default Main;

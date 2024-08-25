@@ -287,7 +287,32 @@ function App({ prefColor }) {
     </>
   );
 }
+
+const CompThatDoesntNeedInput = () => {
+  return (
+    <Box
+      padding={1}
+      flexDirection="column"
+      justifyContent="center"
+      alignItems="center"
+      borderColor="red"
+      borderStyle="round"
+    >
+      <Text color="red">Error:</Text>
+      <Text>tty/stdin/stdout not detected</Text>
+      <Text>
+        Todolister needs input,output streams attached along with tty to run
+      </Text>
+    </Box>
+  );
+};
+
 const Main = ({ prefColor }) => {
-  return <App prefColor={prefColor} />;
+  const { isRawModeSupported } = useStdin();
+  return isRawModeSupported ? (
+    <App prefColor={prefColor} />
+  ) : (
+    <CompThatDoesntNeedInput />
+  );
 };
 export default Main;
