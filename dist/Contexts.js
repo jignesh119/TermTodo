@@ -4,10 +4,14 @@ export const AppContext = /*#__PURE__*/createContext({
   setUpdateMode: () => {},
   selectedId: 0,
   setSelectedId: () => {},
+  terminalWidth: 147,
+  setTerminalWidth: () => {},
   todos: [],
   setTodos: () => {},
   ipData: "",
   setIpData: () => {},
   inputFocus: false,
-  setInputFocus: () => {}
+  setInputFocus: () => {},
+  color: "",
+  setColor: () => {}
 });

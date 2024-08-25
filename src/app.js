@@ -3,11 +3,13 @@ import { useState, useEffect, useContext } from "react";
 import { useStdin, Text, useInput, Box, useApp } from "ink";
 import fs from "fs";
 import { UncontrolledTextInput } from "ink-text-input";
+import BigText from "ink-big-text";
 import { AppContext } from "./Contexts.js";
+import Gradient from "ink-gradient";
+import terminalSize from "terminal-size";
 
 // const dataFilePath = path.resolve(__dirname, 'todos.json');
 const dataFilePath = new URL("todos.json", import.meta.url).pathname;
-/* get todos from a file*/
 function loadTodos() {
   try {
     const data = fs.readFileSync(dataFilePath, "utf8");
@@ -17,7 +19,6 @@ function loadTodos() {
     return [];
   }
 }
-//save todos to a file
 function saveTodos(data) {
   try {
     fs.writeFileSync(dataFilePath, JSON.stringify(data), "utf8");
@@ -37,6 +38,7 @@ function InputBox({ borderStyle, placeholder }) {
     updateMode,
     setUpdateMode,
     selectedId,
+    color,
   } = useContext(AppContext);
   const handleSubmit = (val) => {
     if (updateMode) {
@@ -65,7 +67,7 @@ function InputBox({ borderStyle, placeholder }) {
   };
   return (
     <>
-      <Box flexGrow={1} borderStyle={borderStyle} borderColor="green">
+      <Box flexGrow={1} borderStyle={borderStyle} borderColor={color}>
         <UncontrolledTextInput
           focus={inputFocus}
           value={ipData}
@@ -131,14 +133,17 @@ function Header() {
   return (
     <>
       <Box justifyContent="center">
-        <Text bold>TERM-TODO</Text>
+        <Gradient name="rainbow">
+          <BigText text="term-todo" />
+        </Gradient>
       </Box>
     </>
   );
 }
 function TodosListing() {
-  const { todos, selectedId, updateMode, inputFocus } = useContext(AppContext);
-  const color = "green";
+  const { todos, terminalWidth, selectedId, updateMode, inputFocus, color } =
+    useContext(AppContext);
+  const lineLength = terminalWidth - 6;
   return (
     <>
       <Box borderColor={color} flexDirection="column" borderStyle="round">
@@ -159,12 +164,20 @@ function TodosListing() {
               <Box key={index}>
                 {updateMode && selectedId === index ? (
                   <InputBox
-                    placeholder="ENTER UPDATED TODO"
+                    placeholder={todo || "Enter updated todo"}
                     borderStyle="classic"
                   />
                 ) : (
-                  <Text color={color} key={index}>
-                    {`${todo}`}
+                  <Text
+                    color={color}
+                    inverse={selectedId === index}
+                    bold={selectedId === index}
+                    key={index}
+                  >
+                    {`${todo}${" ".repeat(
+                      Math.floor(todo.length / lineLength + 1) * lineLength -
+                        todo.length,
+                    )}`}
                   </Text>
                 )}
               </Box>
@@ -174,21 +187,51 @@ function TodosListing() {
             <InputBox placeholder="ENTER TODO" borderStyle="round" />
           )}
         </Box>
+        <Box flexDirection="row" gap={2} marginTop={1} justifyContent="center">
+          <Text color="grey" dim>
+            <Text bold>j/↓˗</Text>
+            select
+            <Text bold>˗k/↑</Text>
+          </Text>
+          <Text color="grey" dim>
+            <Text bold>a</Text>
+            dd
+          </Text>
+          <Text color="grey" dim>
+            <Text bold>u</Text>
+            pdate
+          </Text>
+          <Text color="grey" dim>
+            <Text bold>d</Text>
+            elete
+          </Text>
+          <Text color="grey" dim>
+            <Text bold>G˗</Text>
+            bottom
+          </Text>
+          <Text color="grey" dim>
+            <Text bold>gg˗</Text>
+            top
+          </Text>
+        </Box>
       </Box>
     </>
   );
 }
-function App() {
+function App({ prefColor }) {
   const [todos, setTodos] = useState(loadTodos || ["sample"]);
   const [ipData, setIpData] = useState("sample");
   const [inputFocus, setInputFocus] = useState(false);
   const [terminalWidth, setTerminalWidth] = useState(147);
   const [selectedId, setSelectedId] = useState(0);
   const [updateMode, setUpdateMode] = useState(false);
+  const [color, _] = useState(prefColor);
   const [gCount, setGCount] = useState([]);
   const { exit } = useApp();
 
   useEffect(() => {
+    const tSize = terminalSize();
+    setTerminalWidth(tSize.columns);
     let todoList = loadTodos();
     setTodos(todoList);
   }, []);
@@ -231,6 +274,7 @@ function App() {
           setIpData,
           inputFocus,
           setInputFocus,
+          color,
           gCount,
           setGCount,
         }}
@@ -243,7 +287,7 @@ function App() {
     </>
   );
 }
-const Main = () => {
-  return <App />;
+const Main = ({ prefColor }) => {
+  return <App prefColor={prefColor} />;
 };
 export default Main;

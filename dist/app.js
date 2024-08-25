@@ -3,11 +3,13 @@ import { useState, useEffect, useContext } from "react";
 import { useStdin, Text, useInput, Box, useApp } from "ink";
 import fs from "fs";
 import { UncontrolledTextInput } from "ink-text-input";
+import BigText from "ink-big-text";
 import { AppContext } from "./Contexts.js";
+import Gradient from "ink-gradient";
+import terminalSize from "terminal-size";
 
 // const dataFilePath = path.resolve(__dirname, 'todos.json');
 const dataFilePath = new URL("todos.json", import.meta.url).pathname;
-/* get todos from a file*/
 function loadTodos() {
   try {
     const data = fs.readFileSync(dataFilePath, "utf8");
@@ -17,7 +19,6 @@ function loadTodos() {
     return [];
   }
 }
-//save todos to a file
 function saveTodos(data) {
   try {
     fs.writeFileSync(dataFilePath, JSON.stringify(data), "utf8");
@@ -38,7 +39,8 @@ function InputBox({
     setInputFocus,
     updateMode,
     setUpdateMode,
-    selectedId
+    selectedId,
+    color
   } = useContext(AppContext);
   const handleSubmit = val => {
     if (updateMode) {
@@ -66,7 +68,7 @@ function InputBox({
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Box, {
     flexGrow: 1,
     borderStyle: borderStyle,
-    borderColor: "green"
+    borderColor: color
   }, /*#__PURE__*/React.createElement(UncontrolledTextInput, {
     focus: inputFocus,
     value: ipData,
@@ -126,18 +128,22 @@ function handleKeyPress(letter, key, appContext) {
 function Header() {
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Box, {
     justifyContent: "center"
-  }, /*#__PURE__*/React.createElement(Text, {
-    bold: true
-  }, "TERM-TODO")));
+  }, /*#__PURE__*/React.createElement(Gradient, {
+    name: "rainbow"
+  }, /*#__PURE__*/React.createElement(BigText, {
+    text: "term-todo"
+  }))));
 }
 function TodosListing() {
   const {
     todos,
+    terminalWidth,
     selectedId,
     updateMode,
-    inputFocus
+    inputFocus,
+    color
   } = useContext(AppContext);
-  const color = "green";
+  const lineLength = terminalWidth - 6;
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Box, {
     borderColor: color,
     flexDirection: "column",
@@ -156,29 +162,73 @@ function TodosListing() {
     return /*#__PURE__*/React.createElement(Box, {
       key: index
     }, updateMode && selectedId === index ? /*#__PURE__*/React.createElement(InputBox, {
-      placeholder: "ENTER UPDATED TODO",
+      placeholder: todo || "Enter updated todo",
       borderStyle: "classic"
     }) : /*#__PURE__*/React.createElement(Text, {
       color: color,
+      inverse: selectedId === index,
+      bold: selectedId === index,
       key: index
-    }, `${todo}`));
+    }, `${todo}${" ".repeat(Math.floor(todo.length / lineLength + 1) * lineLength - todo.length)}`));
   }), inputFocus && !updateMode && /*#__PURE__*/React.createElement(InputBox, {
     placeholder: "ENTER TODO",
     borderStyle: "round"
-  }))));
+  })), /*#__PURE__*/React.createElement(Box, {
+    flexDirection: "row",
+    gap: 2,
+    marginTop: 1,
+    justifyContent: "center"
+  }, /*#__PURE__*/React.createElement(Text, {
+    color: "grey",
+    dim: true
+  }, /*#__PURE__*/React.createElement(Text, {
+    bold: true
+  }, "j/\u2193\u02D7"), "select", /*#__PURE__*/React.createElement(Text, {
+    bold: true
+  }, "\u02D7k/\u2191")), /*#__PURE__*/React.createElement(Text, {
+    color: "grey",
+    dim: true
+  }, /*#__PURE__*/React.createElement(Text, {
+    bold: true
+  }, "a"), "dd"), /*#__PURE__*/React.createElement(Text, {
+    color: "grey",
+    dim: true
+  }, /*#__PURE__*/React.createElement(Text, {
+    bold: true
+  }, "u"), "pdate"), /*#__PURE__*/React.createElement(Text, {
+    color: "grey",
+    dim: true
+  }, /*#__PURE__*/React.createElement(Text, {
+    bold: true
+  }, "d"), "elete"), /*#__PURE__*/React.createElement(Text, {
+    color: "grey",
+    dim: true
+  }, /*#__PURE__*/React.createElement(Text, {
+    bold: true
+  }, "G\u02D7"), "bottom"), /*#__PURE__*/React.createElement(Text, {
+    color: "grey",
+    dim: true
+  }, /*#__PURE__*/React.createElement(Text, {
+    bold: true
+  }, "gg\u02D7"), "top"))));
 }
-function App() {
+function App({
+  prefColor
+}) {
   const [todos, setTodos] = useState(loadTodos || ["sample"]);
   const [ipData, setIpData] = useState("sample");
   const [inputFocus, setInputFocus] = useState(false);
   const [terminalWidth, setTerminalWidth] = useState(147);
   const [selectedId, setSelectedId] = useState(0);
   const [updateMode, setUpdateMode] = useState(false);
+  const [color, _] = useState(prefColor);
   const [gCount, setGCount] = useState([]);
   const {
     exit
   } = useApp();
   useEffect(() => {
+    const tSize = terminalSize();
+    setTerminalWidth(tSize.columns);
     let todoList = loadTodos();
     setTodos(todoList);
   }, []);
@@ -218,6 +268,7 @@ function App() {
       setIpData,
       inputFocus,
       setInputFocus,
+      color,
       gCount,
       setGCount
     }
@@ -225,7 +276,11 @@ function App() {
     flexDirection: "column"
   }, /*#__PURE__*/React.createElement(Header, null), /*#__PURE__*/React.createElement(TodosListing, null))));
 }
-const Main = () => {
-  return /*#__PURE__*/React.createElement(App, null);
+const Main = ({
+  prefColor
+}) => {
+  return /*#__PURE__*/React.createElement(App, {
+    prefColor: prefColor
+  });
 };
 export default Main;
